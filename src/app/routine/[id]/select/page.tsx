@@ -253,7 +253,7 @@ export default function ExerciseSelection() {
                     >
                       <div className="relative w-16 h-16 rounded-2xl bg-slate-950 overflow-hidden border border-white/5 flex-shrink-0">
                         <img 
-                            src={ex.gif_url ? (ex.gif_url.startsWith('/') ? ex.gif_url : `/${ex.gif_url}`) : (ex.image.startsWith('/') ? ex.image : `/${ex.image}`)} 
+                            src={ex.gif_url ? (ex.gif_url.startsWith('/') ? ex.gif_url : `/${ex.gif_url}`) : ''} 
                             alt={ex.name} 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             loading="lazy"
