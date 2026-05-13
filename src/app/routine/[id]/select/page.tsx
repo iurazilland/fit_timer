@@ -49,7 +49,7 @@ function AddExerciseModal({
                 <div className="p-8 pb-4 flex flex-col items-center">
                     <div className="w-32 h-32 bg-slate-950 rounded-[2rem] overflow-hidden border border-white/5 mb-4 shadow-xl">
                         <img 
-                            src={exercise.gif_url ? (exercise.gif_url.startsWith('/') ? exercise.gif_url : `/${exercise.gif_url}`) : (exercise.image.startsWith('/') ? exercise.image : `/${exercise.image}`)} 
+                            src={exercise.gif_url ? (exercise.gif_url.startsWith('/') ? exercise.gif_url : `/${exercise.gif_url}`) : ''} 
                             alt={exercise.name} 
                             className="w-full h-full object-cover"
                         />

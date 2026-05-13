@@ -160,7 +160,7 @@ function ExerciseCardContent({
     base: any, 
     dragHandleProps?: any
   }) {
-      const assetPath = base ? (base.gif_url || base.image) : null;
+      const assetPath = base ? base.gif_url : null;
       const finalSrc = assetPath ? (assetPath.startsWith('/') ? assetPath : `/${assetPath}`) : null;
 
       return (
