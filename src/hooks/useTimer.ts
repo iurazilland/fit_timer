@@ -25,7 +25,7 @@ export const useTimer = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentRound, setCurrentRound] = useState(1);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [lastActiveStatus, setLastActiveStatus] = useState<'working' | 'resting'>('working');
+  const [lastActiveStatus, setLastActiveStatus] = useState<'working' | 'resting' | 'preparing'>('working');
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -58,7 +58,7 @@ export const useTimer = ({
       setCurrentRound(1);
       setTimeLeft(10); // 10 seconds prep time
       setStatus('preparing');
-      setLastActiveStatus('preparing' as any);
+      setLastActiveStatus('preparing');
       onBeep?.('prepare');
     } else if (status === 'paused') {
       setStatus(lastActiveStatus);
