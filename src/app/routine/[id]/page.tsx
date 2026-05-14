@@ -357,14 +357,16 @@ export default function RoutineDetail() {
   // Calculate Total Time:
   // Each round except the last: (Sum of work + rest for all but last + last work + roundRest)
   // Last round: (Sum of work + rest for all but last + last work)
-  const sumWorkRest = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
+  const sumWork = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30), 0);
+  const sumRestExceptLast = routine.exercises.length > 1 
+    ? routine.exercises.slice(0, -1).reduce((acc: number, ex: any) => acc + (ex.restTime || 10), 0)
+    : 0;
   const lastRest = routine.exercises.length > 0 ? (routine.exercises[routine.exercises.length - 1].restTime || 10) : 0;
   const roundRest = routine.roundRest ?? 0;
   const rounds = routine.rounds || 1;
   
-  const totalSeconds = rounds > 1 
-    ? (sumWorkRest - lastRest + roundRest) * (rounds - 1) + (sumWorkRest - lastRest)
-    : (sumWorkRest - lastRest);
+  const effectiveRoundEndRest = roundRest > 0 ? roundRest : lastRest;
+  const totalSeconds = (sumWork + sumRestExceptLast + effectiveRoundEndRest) * (rounds - 1) + (sumWork + sumRestExceptLast);
 
   const totalMins = Math.floor(totalSeconds / 60);
   const totalSecs = totalSeconds % 60;
@@ -425,9 +427,10 @@ export default function RoutineDetail() {
                     <div className="flex items-center gap-1.5 md:gap-3 bg-slate-950/50 rounded-xl md:rounded-2xl p-1 border border-white/5">
                         <button 
                             onClick={() => {
-                                if (id.startsWith('p-')) return;
                                 const newRounds = Math.max(1, (routine.rounds || 1) - 1);
-                                updateRoutine({ ...routine, rounds: newRounds });
+                                const updated = { ...routine, rounds: newRounds };
+                                setRoutine(updated);
+                                if (!id.startsWith('p-')) updateRoutine(updated);
                             }}
                             className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-90"
                         >
@@ -438,9 +441,10 @@ export default function RoutineDetail() {
                         </span>
                         <button 
                             onClick={() => {
-                                if (id.startsWith('p-')) return;
                                 const newRounds = (routine.rounds || 1) + 1;
-                                updateRoutine({ ...routine, rounds: newRounds });
+                                const updated = { ...routine, rounds: newRounds };
+                                setRoutine(updated);
+                                if (!id.startsWith('p-')) updateRoutine(updated);
                             }}
                             className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-purple-600 flex items-center justify-center text-white hover:bg-purple-500 transition-all active:scale-90"
                         >
@@ -455,9 +459,10 @@ export default function RoutineDetail() {
                     <div className="flex items-center gap-1.5 md:gap-3 bg-slate-950/50 rounded-xl md:rounded-2xl p-1 border border-white/5">
                         <button 
                             onClick={() => {
-                                if (id.startsWith('p-')) return;
                                 const newRest = Math.max(0, (routine.roundRest || 0) - 5);
-                                updateRoutine({ ...routine, roundRest: newRest });
+                                const updated = { ...routine, roundRest: newRest };
+                                setRoutine(updated);
+                                if (!id.startsWith('p-')) updateRoutine(updated);
                             }}
                             className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-90"
                         >
@@ -468,9 +473,10 @@ export default function RoutineDetail() {
                         </span>
                         <button 
                             onClick={() => {
-                                if (id.startsWith('p-')) return;
                                 const newRest = (routine.roundRest ?? 0) + 5;
-                                updateRoutine({ ...routine, roundRest: newRest });
+                                const updated = { ...routine, roundRest: newRest };
+                                setRoutine(updated);
+                                if (!id.startsWith('p-')) updateRoutine(updated);
                             }}
                             className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-600 flex items-center justify-center text-white hover:bg-emerald-500 transition-all active:scale-90"
                         >

@@ -25,8 +25,17 @@ export default function Home() {
   };
 
   const calculateTotalTime = (routine: any) => {
-    const totalSecondsPerRound = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
-    const totalSeconds = totalSecondsPerRound * (routine.rounds || 1);
+    const sumWork = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30), 0);
+    const sumRestExceptLast = routine.exercises.length > 1 
+      ? routine.exercises.slice(0, -1).reduce((acc: number, ex: any) => acc + (ex.restTime || 10), 0)
+      : 0;
+    const lastRest = routine.exercises.length > 0 ? (routine.exercises[routine.exercises.length - 1].restTime || 10) : 0;
+    const roundRest = routine.roundRest ?? 0;
+    const rounds = routine.rounds || 1;
+    
+    const effectiveRoundEndRest = roundRest > 0 ? roundRest : lastRest;
+    const totalSeconds = (sumWork + sumRestExceptLast + effectiveRoundEndRest) * (rounds - 1) + (sumWork + sumRestExceptLast);
+    
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
     return `${mins}분 ${secs}초`;
@@ -99,14 +108,16 @@ export default function Home() {
                       <span className="flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">
                         <Clock className="w-3 h-3" /> 
                         {(() => {
-                          const sumWorkRest = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
+                          const sumWork = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30), 0);
+                          const sumRestExceptLast = routine.exercises.length > 1 
+                            ? routine.exercises.slice(0, -1).reduce((acc: number, ex: any) => acc + (ex.restTime || 10), 0)
+                            : 0;
                           const lastRest = routine.exercises.length > 0 ? (routine.exercises[routine.exercises.length - 1].restTime || 10) : 0;
                           const roundRest = routine.roundRest ?? 0;
                           const rounds = routine.rounds || 1;
                           
-                          const totalSeconds = rounds > 1 
-                            ? (sumWorkRest - lastRest + roundRest) * (rounds - 1) + (sumWorkRest - lastRest)
-                            : (sumWorkRest - lastRest);
+                          const effectiveRoundEndRest = roundRest > 0 ? roundRest : lastRest;
+                          const totalSeconds = (sumWork + sumRestExceptLast + effectiveRoundEndRest) * (rounds - 1) + (sumWork + sumRestExceptLast);
                             
                           return `${Math.floor(totalSeconds / 60)}분 ${totalSeconds % 60}초`;
                         })()}

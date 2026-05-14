@@ -47,7 +47,7 @@
     "color": "from-blue-500 to-indigo-600",
     "icon": "Dumbbell",
     "rounds": 3,
-    "roundRest": 30,
+    "roundRest": 60,
     "exercises": [
       {
         "id": "3220",
@@ -82,7 +82,7 @@
     "color": "from-orange-400 to-red-500",
     "icon": "Flame",
     "rounds": 4,
-    "roundRest": 0,
+    "roundRest": 20,
     "exercises": [
       {
         "id": "3220",
@@ -117,36 +117,36 @@
     "color": "from-purple-600 to-slate-900",
     "icon": "Zap",
     "rounds": 3,
-    "roundRest": 20,
+    "roundRest": 75,
     "exercises": [
       {
         "id": "1160",
         "name": "Burpee",
-        "workTime": 45,
+        "workTime": 50,
         "restTime": 15
       },
       {
         "id": "1685",
         "name": "Squat to overhead reach",
-        "workTime": 45,
+        "workTime": 50,
         "restTime": 15
       },
       {
         "id": "3662",
         "name": "Pike-to-cobra push-up",
-        "workTime": 45,
+        "workTime": 50,
         "restTime": 15
       },
       {
         "id": "0464",
         "name": "Front plank with twist",
-        "workTime": 45,
+        "workTime": 50,
         "restTime": 15
       },
       {
         "id": "0620",
         "name": "Lying leg raise flat bench",
-        "workTime": 45,
+        "workTime": 50,
         "restTime": 15
       }
     ]

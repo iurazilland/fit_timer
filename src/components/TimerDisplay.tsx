@@ -66,12 +66,7 @@ export default function TimerDisplay({
         <X className="w-5 h-5" />
       </button>
 
-      {/* Center Round Indicator */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[110] px-6 h-12 bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-full flex items-center justify-center text-white shadow-lg shadow-black/20">
-        <span className="text-xl font-black tabular-nums">
-            {currentRound} <span className="text-sm text-white mx-1">/</span> {totalRounds}
-        </span>
-      </div>
+
 
       {/* Top Right Music Toggle */}
       <button 
@@ -164,13 +159,8 @@ export default function TimerDisplay({
                         <span className="text-7xl font-black text-white tabular-nums tracking-tighter">
                             {timeLeft}<span className="text-xl text-slate-600 ml-1">S</span>
                         </span>
-                        <span className="text-slate-500 font-black tracking-widest text-sm">
-                            {isWorking 
-                              ? 'WORK PHASE' 
-                              : isPreparing 
-                                ? 'PREPARATION' 
-                                : (isSetRest ? '세트 휴식' : 'REST PHASE')
-                            }
+                        <span className="text-white font-black text-2xl tabular-nums">
+                            {currentRound} <span className="text-slate-600 text-lg">/</span> {totalRounds}
                         </span>
                     </div>
 

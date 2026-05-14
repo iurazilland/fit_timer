@@ -120,31 +120,26 @@ export const useTimer = ({
       beep('start');
     } else if (s === 'working') {
       const isLastExerciseInRound = idx === exs.length - 1;
+      const isLastRound = cr === tr;
       
       if (!isLastExerciseInRound) {
         setStatus('resting');
         setLastActiveStatus('resting');
         setTimeLeft(Number(exs[idx]?.restTime ?? rd ?? 10));
         beep('rest');
+      } else if (!isLastRound) {
+        // Last exercise of a round (but not the final round)
+        // If set rest is specified, use it. Otherwise, use normal exercise rest.
+        const exerciseRest = Number(exs[idx]?.restTime ?? rd ?? 10);
+        const setRest = Number(rrd);
+        setStatus('resting');
+        setLastActiveStatus('resting');
+        setTimeLeft(setRest > 0 ? setRest : exerciseRest);
+        beep('rest');
       } else {
-        if (cr < tr) {
-          if (Number(rrd) > 0) {
-            setStatus('resting');
-            setLastActiveStatus('resting');
-            setTimeLeft(Number(rrd));
-            beep('rest');
-          } else {
-            setCurrentIndex(0);
-            setCurrentRound(cr + 1);
-            setStatus('working');
-            setLastActiveStatus('working');
-            setTimeLeft(Number(exs[0]?.workTime ?? wd ?? 30));
-            beep('start');
-          }
-        } else {
-          setStatus('finished');
-          beep('stop');
-        }
+        // Absolute last exercise of the entire workout
+        setStatus('finished');
+        beep('stop');
       }
     } else if (s === 'resting') {
       const isRoundRest = idx === exs.length - 1;
@@ -277,8 +272,8 @@ export const useTimer = ({
     ? (exercises[currentIndex]?.workTime ?? workDuration ?? 30)
     : (status === 'preparing'
         ? 10 
-        : (status === 'resting' && currentIndex === exercises.length - 1 && currentRound < totalRounds
-            ? roundRestDuration
+        : (status === 'resting' && currentIndex === exercises.length - 1
+            ? (roundRestDuration > 0 ? roundRestDuration : (exercises[currentIndex]?.restTime ?? restDuration ?? 10))
             : (exercises[currentIndex]?.restTime ?? restDuration ?? 10)));
 
   return {
