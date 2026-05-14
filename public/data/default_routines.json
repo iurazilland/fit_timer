@@ -1,0 +1,154 @@
+[
+  {
+    "id": "p-stretching",
+    "title": "1. 전신 스트레칭",
+    "desc": "근육의 긴장을 풀고 유연성을 높이는 웜업 루틴",
+    "color": "from-emerald-400 to-teal-500",
+    "icon": "Sparkles",
+    "rounds": 1,
+    "roundRest": 0,
+    "exercises": [
+      {
+        "id": "0716",
+        "name": "Side push neck stretch",
+        "workTime": 40,
+        "restTime": 10
+      },
+      {
+        "id": "0817",
+        "name": "Triceps stretch",
+        "workTime": 40,
+        "restTime": 10
+      },
+      {
+        "id": "0794",
+        "name": "Standing lateral stretch",
+        "workTime": 40,
+        "restTime": 10
+      },
+      {
+        "id": "0257",
+        "name": "Circles knee stretch",
+        "workTime": 40,
+        "restTime": 10
+      },
+      {
+        "id": "1494",
+        "name": "Butterfly yoga pose",
+        "workTime": 40,
+        "restTime": 10
+      }
+    ]
+  },
+  {
+    "id": "p-foundation",
+    "title": "2. 기초체력 다지기",
+    "desc": "올바른 자세를 익히고 핵심 근육을 강화하는 단계",
+    "color": "from-blue-500 to-indigo-600",
+    "icon": "Dumbbell",
+    "rounds": 3,
+    "roundRest": 30,
+    "exercises": [
+      {
+        "id": "3220",
+        "name": "Astride jumps",
+        "workTime": 40,
+        "restTime": 20
+      },
+      {
+        "id": "3211",
+        "name": "Kneeling push-up",
+        "workTime": 40,
+        "restTime": 20
+      },
+      {
+        "id": "3470",
+        "name": "Forward lunge",
+        "workTime": 40,
+        "restTime": 20
+      },
+      {
+        "id": "2135",
+        "name": "Weighted front plank",
+        "workTime": 40,
+        "restTime": 20
+      }
+    ]
+  },
+  {
+    "id": "p-cardio",
+    "title": "3. 유산소 버닝",
+    "desc": "심박수를 높여 체지방 연소를 극대화하는 루틴",
+    "color": "from-orange-400 to-red-500",
+    "icon": "Flame",
+    "rounds": 4,
+    "roundRest": 0,
+    "exercises": [
+      {
+        "id": "3220",
+        "name": "Astride jumps",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "3543",
+        "name": "Bodyweight drop jump squat",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "0630",
+        "name": "Mountain climber",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "0003",
+        "name": "Air bike",
+        "workTime": 45,
+        "restTime": 15
+      }
+    ]
+  },
+  {
+    "id": "p-advanced",
+    "title": "4. 고강도 트레이닝",
+    "desc": "최대 근력과 지구력을 요구하는 챌린지 프로그램",
+    "color": "from-purple-600 to-slate-900",
+    "icon": "Zap",
+    "rounds": 4,
+    "roundRest": 20,
+    "exercises": [
+      {
+        "id": "1160",
+        "name": "Burpee",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "1685",
+        "name": "Squat to overhead reach",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "3662",
+        "name": "Pike-to-cobra push-up",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "0464",
+        "name": "Front plank with twist",
+        "workTime": 45,
+        "restTime": 15
+      },
+      {
+        "id": "0620",
+        "name": "Lying leg raise flat bench",
+        "workTime": 45,
+        "restTime": 15
+      }
+    ]
+  }
+]

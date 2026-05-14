@@ -22,6 +22,7 @@ interface TimerDisplayProps {
   version?: number;
   isMusicMuted?: boolean;
   onToggleMusic?: () => void;
+  isSetRest?: boolean;
 }
 
 export default function TimerDisplay({
@@ -40,7 +41,8 @@ export default function TimerDisplay({
   currentIndex,
   version,
   isMusicMuted,
-  onToggleMusic
+  onToggleMusic,
+  isSetRest
 }: TimerDisplayProps) {
   const isWorking = status === 'working';
   const isResting = status === 'resting';
@@ -49,7 +51,10 @@ export default function TimerDisplay({
 
   const activeExercise = (isResting || isPreparing) ? nextExercise : currentExercise;
   const displayExercise = isResting ? nextExercise : currentExercise;
-  const progress = (timeLeft / totalTimeForStep) * 100;
+  
+  // Ensure progress is a valid number to prevent animation crashes (Infinity/NaN)
+  const safeTotalTime = totalTimeForStep > 0 ? totalTimeForStep : 1;
+  const progress = Math.max(0, Math.min(100, (timeLeft / safeTotalTime) * 100));
 
   return (
     <div className="flex flex-col h-full bg-slate-950 overflow-hidden relative">
@@ -64,7 +69,7 @@ export default function TimerDisplay({
       {/* Center Round Indicator */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[110] px-6 h-12 bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-full flex items-center justify-center text-white shadow-lg shadow-black/20">
         <span className="text-xl font-black tabular-nums">
-            {currentRound} <span className="text-sm text-slate-500 mx-1">/</span> {totalRounds}
+            {currentRound} <span className="text-sm text-white mx-1">/</span> {totalRounds}
         </span>
       </div>
 
@@ -100,11 +105,11 @@ export default function TimerDisplay({
                         transition={{ duration: 0.5 }}
                         className="w-full h-full"
                     >
-                        {displayExercise ? (
+                        {displayExercise?.gif_url ? (
                             <img 
-                                src={displayExercise.gif_url ? (displayExercise.gif_url.startsWith('/') ? displayExercise.gif_url : `/${displayExercise.gif_url}`) : ''} 
+                                src={displayExercise.gif_url.startsWith('/') ? displayExercise.gif_url : `/${displayExercise.gif_url}`} 
                                 alt="" 
-                                className={`w-full h-full object-contain ${(isResting || isPreparing) ? 'opacity-30 blur-sm grayscale' : 'opacity-100'}`} 
+                                className={`w-full h-full object-contain bg-white ${(isResting || isPreparing) ? 'opacity-50 brightness-[0.7]' : 'opacity-100'}`} 
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-800">
@@ -142,7 +147,14 @@ export default function TimerDisplay({
             <div className="flex-1 bg-slate-950 px-8 py-6 flex flex-col justify-between">
                 <div>
                     <h2 className="text-3xl font-black text-white mb-2 leading-tight">
-                        {isWorking ? currentExercise?.name : (isPreparing ? `곧 시작: ${currentExercise?.name}` : (nextExercise ? `다음: ${nextExercise.name}` : '마지막 운동입니다!'))}
+                        {isWorking 
+                          ? (currentExercise?.name) 
+                          : (isPreparing 
+                            ? '운동 준비' 
+                            : (isSetRest 
+                                ? '세트 휴식' 
+                                : (nextExercise ? '준비' : '마지막 운동입니다!')))
+                        }
                     </h2>
                 </div>
 
@@ -153,7 +165,12 @@ export default function TimerDisplay({
                             {timeLeft}<span className="text-xl text-slate-600 ml-1">S</span>
                         </span>
                         <span className="text-slate-500 font-black tracking-widest text-sm">
-                            {isWorking ? 'WORK PHASE' : isPreparing ? 'PREPARATION' : 'REST PHASE'}
+                            {isWorking 
+                              ? 'WORK PHASE' 
+                              : isPreparing 
+                                ? 'PREPARATION' 
+                                : (isSetRest ? '세트 휴식' : 'REST PHASE')
+                            }
                         </span>
                     </div>
 
@@ -166,6 +183,7 @@ export default function TimerDisplay({
                             className={`h-full rounded-full ${
                                 isWorking ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 
                                 isPreparing ? 'bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' :
+                                isSetRest ? 'bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)]' :
                                 'bg-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.4)]'
                             }`}
                         />

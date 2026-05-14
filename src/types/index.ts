@@ -1,10 +1,10 @@
 export interface ExerciseData {
   id: string;
   name: string;
-  description: string;
-  imagePath: string;
-  gifUrl: string;
-  category: string;
+  name_ko?: string;
+  body_part: string;
+  equipment: string;
+  gif_url: string;
 }
 
 export interface RoutineExercise {

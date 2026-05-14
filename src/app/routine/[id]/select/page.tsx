@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, Plus, X, Clock, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, Plus, X, Clock, Check, ChevronRight, ChevronUp } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useRoutines } from '@/hooks/useRoutines';
 import { translate, translateInstructions } from '@/utils/translate';
@@ -10,8 +10,10 @@ import { translate, translateInstructions } from '@/utils/translate';
 interface Exercise {
   id: string;
   name: string;
+  name_ko: string;
   category: string;
   body_part: string;
+  body_part_ko: string;
   equipment: string;
   gif_url: string;
 }
@@ -54,10 +56,10 @@ function AddExerciseModal({
                             className="w-full h-full object-cover"
                         />
                     </div>
-                    <h3 className="text-2xl font-black text-white text-center leading-tight">{exercise.name}</h3>
+                    <h3 className="text-2xl font-black text-white text-center leading-tight capitalize">{exercise.name}</h3>
                     <div className="flex gap-2 mt-2">
-                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">{exercise.body_part}</span>
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">{translate(exercise.equipment)}</span>
+                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">{exercise.body_part_ko}</span>
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">{exercise.equipment}</span>
                     </div>
                 </div>
 
@@ -118,10 +120,14 @@ export default function ExerciseSelection() {
   const [displayCount, setDisplayCount] = useState(100);
 
   const categoryGroups: { [key: string]: string[] } = {
-    '상체': ['back', 'chest', 'lower arms', 'shoulders', 'upper arms', 'neck'],
-    '하체': ['lower legs', 'upper legs'],
-    '코어/복근': ['abs', 'waist'],
-    '유산소': ['cardio']
+    '가슴': ['가슴'],
+    '등': ['등'],
+    '어깨': ['어깨'],
+    '팔': ['팔'],
+    '하체': ['하체'],
+    '코어': ['코어'],
+    '유산소': ['유산소'],
+    '스트레칭': [] // special handling
   };
 
   const categories = useMemo(() => ['전체', ...Object.keys(categoryGroups)], []);
@@ -129,7 +135,7 @@ export default function ExerciseSelection() {
   useEffect(() => {
     const loadExercises = async () => {
       try {
-        const res = await fetch('/data/exercises_ko.json?v=final');
+        const res = await fetch('/data/exercises_all.json');
         const data = await res.json();
         setAllExercises(data);
       } catch (err) {
@@ -169,19 +175,57 @@ export default function ExerciseSelection() {
 
   const filteredExercises = useMemo(() => {
     return allExercises.filter(ex => {
-      const matchesSearch = ex.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const nameMatch = (ex.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                       (ex.name_ko || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const partMatch = (ex.body_part_ko || '').includes(searchTerm);
+      const matchesSearch = nameMatch || partMatch;
       
-      if (filter === '전체') return matchesSearch;
+      if (!matchesSearch) return false;
+      if (filter === '전체') return true;
       
-      const allowedCategories = categoryGroups[filter] || [];
-      return matchesSearch && (allowedCategories.includes(ex.category) || allowedCategories.includes(ex.body_part));
+      if (filter === '스트레칭') {
+        return (ex.name || '').toLowerCase().includes('stretch') || 
+               (ex.name_ko || '').includes('스트레칭');
+      }
+      
+      const allowedParts = categoryGroups[filter] || [];
+      return allowedParts.includes(ex.body_part_ko);
     });
   }, [allExercises, filter, searchTerm]);
+
+  const [showTopBtn, setShowTopBtn] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowTopBtn(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (!isLoaded) return null;
 
   return (
-    <main className="w-full min-h-screen bg-slate-950 flex flex-col items-center">
+    <main className="w-full min-h-screen bg-slate-950 flex flex-col items-center relative">
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showTopBtn && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            onClick={scrollToTop}
+            className="fixed bottom-10 right-6 md:right-12 z-[100] w-14 h-14 bg-purple-600 text-white rounded-2xl shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:bg-purple-500 transition-all active:scale-95"
+          >
+            <ChevronUp className="w-7 h-7" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       <div className="w-full max-w-4xl flex flex-col min-h-screen relative px-4 md:px-6 py-6 pb-32">
       <header className="flex items-center gap-4 mb-8">
         <button 
@@ -254,7 +298,7 @@ export default function ExerciseSelection() {
                     >
                       <div className="relative w-16 h-16 rounded-2xl bg-slate-950 overflow-hidden border border-white/5 flex-shrink-0">
                         <img 
-                            src={ex.gif_url ? (ex.gif_url.startsWith('/') ? ex.gif_url : `/${ex.gif_url}`) : ''} 
+                            src={ex.image ? (ex.image.startsWith('/') ? ex.image : `/${ex.image}`) : ''} 
                             alt={ex.name} 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             loading="lazy"
@@ -266,10 +310,10 @@ export default function ExerciseSelection() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-white text-sm leading-snug mb-1 truncate">{ex.name}</h3>
+                        <h3 className="font-bold text-white text-sm leading-snug mb-1 truncate capitalize">{ex.name}</h3>
                         <div className="flex flex-wrap gap-1.5">
-                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest bg-slate-950/50 px-2 py-0.5 rounded-md border border-slate-800 truncate max-w-[80px]">{ex.body_part}</span>
-                            <span className="text-[8px] font-black text-purple-500/70 uppercase tracking-widest bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10 truncate max-w-[80px]">{translate(ex.equipment)}</span>
+                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest bg-slate-950/50 px-2 py-0.5 rounded-md border border-slate-800 truncate max-w-[80px]">{ex.body_part_ko}</span>
+                            <span className="text-[8px] font-black text-purple-500/70 uppercase tracking-widest bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10 truncate max-w-[80px]">{ex.equipment}</span>
                         </div>
                       </div>
                       <div className="w-8 h-8 rounded-xl bg-slate-950 text-slate-700 flex items-center justify-center border border-slate-800 group-hover:text-purple-500 group-hover:border-purple-500/30 transition-all flex-shrink-0">

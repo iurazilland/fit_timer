@@ -165,12 +165,12 @@ function ExerciseCardContent({
 
       return (
           <div className="w-full min-w-0 bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-3 rounded-3xl flex items-center gap-2 md:gap-3 group hover:border-slate-700 transition-all">
-              <div className="relative w-16 h-16 bg-slate-950 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5">
+              <div className="relative w-16 h-16 bg-white rounded-2xl overflow-hidden flex-shrink-0 border border-white/5">
                   {finalSrc ? (
                       <img 
                           src={finalSrc} 
                           alt={base?.name} 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain bg-white"
                           onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               console.error(`Routine Image Error: ${target.src}`);
@@ -189,7 +189,14 @@ function ExerciseCardContent({
               </div>
               
               <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-white text-base leading-tight mb-1.5 truncate tracking-tight">{base ? (base.name_ko || base.name) : 'Unknown Exercise'}</h4>
+                  <div className="flex items-center gap-2 mb-1">
+                      <span className="px-1.5 py-0.5 bg-slate-950/50 border border-slate-800 rounded-md text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                          {base?.body_part_ko || '기타'}
+                      </span>
+                  </div>
+                  <h4 className="font-bold text-white text-base leading-tight mb-2 truncate tracking-tight capitalize">
+                      {base ? base.name : 'Unknown Exercise'}
+                  </h4>
                   <div className="flex items-center gap-2">
                       <div className="flex flex-col items-start bg-emerald-500/5 border border-emerald-500/10 px-2 md:px-3 py-1 md:py-1.5 rounded-xl">
                           <span className="text-[9px] font-black text-emerald-500/50 uppercase tracking-tighter leading-none mb-0.5">운동</span>
@@ -235,34 +242,71 @@ export default function RoutineDetail() {
 
   useEffect(() => {
     if (isLoaded) {
-      const r = getRoutine(id);
-      console.log("Routine fetched:", r);
-      if (!r) {
-          router.push('/');
+      if (id.startsWith('p-')) {
+        fetch('/data/default_routines.json')
+          .then(res => res.json())
+          .then(presets => {
+            const preset = presets.find((p: any) => p.id === id);
+            if (preset) {
+              const mappedExercises = preset.exercises.map((ex: any) => ({
+                ...ex,
+                exerciseId: ex.id,
+                workTime: ex.workTime || 30,
+                restTime: ex.restTime || 10,
+                id: `preset-${preset.id}-${ex.id}`
+              }));
+
+              setRoutine({
+                id: preset.id,
+                name: preset.title,
+                exercises: mappedExercises,
+                rounds: preset.rounds || 1,
+                roundRest: preset.roundRest ?? 0
+              });
+              
+              if (exerciseData.length > 0) {
+                setIsLoading(false);
+              }
+            } else {
+              router.push('/');
+            }
+          })
+          .catch(() => router.push('/'));
       } else {
+        const r = getRoutine(id);
+        if (!r) {
+          router.push('/');
+        } else {
           setRoutine(r);
-          setIsLoading(false); // 루틴만 찾아지면 일단 로딩 해제
+          if (exerciseData.length > 0) {
+            setIsLoading(false);
+          }
+        }
       }
     }
-  }, [id, isLoaded, getRoutine, router]);
+  }, [id, isLoaded, exerciseData.length, getRoutine, router]);
 
   useEffect(() => {
-    console.log("Fetching exercise data (KO)...");
-    fetch('/data/exercises_ko.json?v=final')
-      .then(res => res.json())
-      .then(data => {
-          console.log("Exercise data loaded:", data.length, "items");
-          setExerciseData(data);
-      })
-      .catch(err => {
-          console.error("Failed to load exercises:", err);
-      });
-  }, []);
+    if (exerciseData.length === 0) {
+      fetch('/data/exercises_all.json')
+        .then(res => res.json())
+        .then(data => {
+            setExerciseData(data);
+        });
+    }
+  }, [exerciseData.length]);
+
+  // Handle loading state when exerciseData finally arrives
+  useEffect(() => {
+    if (routine && exerciseData.length > 0 && isLoading) {
+      setIsLoading(false);
+    }
+  }, [routine, exerciseData, isLoading]);
 
   const routineExercises = useMemo(() => {
     if (!routine) return [];
     return routine.exercises.map((re: any) => {
-        const base = exerciseData.find(ex => ex.id === re.exerciseId);
+        const base = exerciseData.find(ex => String(ex.id) === String(re.exerciseId));
         if (!base && exerciseData.length > 0) {
             console.warn(`Exercise base data not found for ID: ${re.exerciseId}`);
         }
@@ -274,8 +318,9 @@ export default function RoutineDetail() {
 
   const timer = useTimer({
     exercises: routineExercises,
-    workDuration: 0,
-    restDuration: 0,
+    workDuration: 30,
+    restDuration: 10,
+    roundRestDuration: routine?.roundRest ?? 0,
     rounds: routine?.rounds || 1,
     onBeep: notify
   });
@@ -285,6 +330,7 @@ export default function RoutineDetail() {
   }, [timer.status, isMusicMuted, setBGM]);
 
   const handleDragEnd = (event: DragEndEvent) => {
+    if (id.startsWith('p-')) return;
     const { active, over } = event;
     if (over && active.id !== over.id) {
         const oldIndex = routine.exercises.findIndex((ex: any) => ex.id === active.id);
@@ -297,6 +343,7 @@ export default function RoutineDetail() {
   };
 
   const removeExercise = (instanceId: string) => {
+    if (id.startsWith('p-')) return;
     const updated = {
       ...routine,
       exercises: routine.exercises.filter((ex: any) => ex.id !== instanceId)
@@ -307,9 +354,18 @@ export default function RoutineDetail() {
 
   if (!routine) return null;
 
-  // Calculate Total Time: (Sum of work + rest) * Rounds
-  const totalSecondsPerRound = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
-  const totalSeconds = totalSecondsPerRound * (routine.rounds || 1);
+  // Calculate Total Time:
+  // Each round except the last: (Sum of work + rest for all but last + last work + roundRest)
+  // Last round: (Sum of work + rest for all but last + last work)
+  const sumWorkRest = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
+  const lastRest = routine.exercises.length > 0 ? (routine.exercises[routine.exercises.length - 1].restTime || 10) : 0;
+  const roundRest = routine.roundRest ?? 0;
+  const rounds = routine.rounds || 1;
+  
+  const totalSeconds = rounds > 1 
+    ? (sumWorkRest - lastRest + roundRest) * (rounds - 1) + (sumWorkRest - lastRest)
+    : (sumWorkRest - lastRest);
+
   const totalMins = Math.floor(totalSeconds / 60);
   const totalSecs = totalSeconds % 60;
 
@@ -347,48 +403,78 @@ export default function RoutineDetail() {
               </button>
             </header>
 
-            <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-4 md:p-8 mb-10 flex items-center justify-between shadow-2xl shadow-black/20">
+            <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-4 md:p-6 mb-10 grid grid-cols-3 gap-2 md:gap-4 shadow-2xl shadow-black/20">
                 {/* Total Time Section */}
-                <div className="flex-1 min-w-0 flex flex-col items-start gap-1">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">총 운동 시간</p>
+                <div className="flex flex-col items-center justify-center gap-1">
+                    <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">총 운동 시간</p>
                     <div className="flex items-baseline gap-1 whitespace-nowrap">
-                        <span className="text-3xl font-black text-white tabular-nums tracking-tight inline-block min-w-[1.1em] text-right">
+                        <span className="text-xl md:text-3xl font-black text-white tabular-nums tracking-tight">
                             {totalMins}
                         </span>
-                        <span className="text-xs font-bold text-slate-500 mr-2">분</span>
-                        <span className="text-3xl font-black text-white tabular-nums tracking-tight">
+                        <span className="text-[10px] md:text-xs font-bold text-slate-500">분</span>
+                        <span className="text-xl md:text-3xl font-black text-white tabular-nums tracking-tight ml-1">
                             {totalSecs.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-xs font-bold text-slate-500">초</span>
+                        <span className="text-[10px] md:text-xs font-bold text-slate-500">초</span>
                     </div>
                 </div>
 
-                <div className="w-px h-12 bg-gradient-to-b from-transparent via-slate-800 to-transparent mx-2 md:mx-8 opacity-50"></div>
-
                 {/* Rounds Selector Section */}
-                <div className="flex-1 flex flex-col items-end gap-2">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mr-1">반복 루틴</p>
-                    <div className="flex items-center bg-slate-950/50 rounded-2xl p-1 border border-white/5">
+                <div className="flex flex-col items-center justify-center gap-2 border-x border-white/5">
+                    <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">반복 세트</p>
+                    <div className="flex items-center gap-1.5 md:gap-3 bg-slate-950/50 rounded-xl md:rounded-2xl p-1 border border-white/5">
                         <button 
                             onClick={() => {
+                                if (id.startsWith('p-')) return;
                                 const newRounds = Math.max(1, (routine.rounds || 1) - 1);
                                 updateRoutine({ ...routine, rounds: newRounds });
                             }}
-                            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-90 hover:bg-slate-800"
+                            className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-90"
                         >
-                            <span className="text-xl font-light">-</span>
+                            <span className="text-lg md:text-xl font-light">-</span>
                         </button>
-                        <span className="text-xl md:text-2xl font-black text-white min-w-[2rem] md:min-w-[3rem] text-center tabular-nums">
+                        <span className="text-lg md:text-2xl font-black text-white min-w-[1.2rem] md:min-w-[2rem] text-center tabular-nums">
                             {routine.rounds || 1}
                         </span>
                         <button 
                             onClick={() => {
+                                if (id.startsWith('p-')) return;
                                 const newRounds = (routine.rounds || 1) + 1;
                                 updateRoutine({ ...routine, rounds: newRounds });
                             }}
-                            className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/20 active:scale-90"
+                            className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-purple-600 flex items-center justify-center text-white hover:bg-purple-500 transition-all active:scale-90"
                         >
-                            <span className="text-xl font-light">+</span>
+                            <span className="text-lg md:text-xl font-light">+</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Round Rest Selector Section */}
+                <div className="flex flex-col items-center justify-center gap-2">
+                    <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">세트 휴식</p>
+                    <div className="flex items-center gap-1.5 md:gap-3 bg-slate-950/50 rounded-xl md:rounded-2xl p-1 border border-white/5">
+                        <button 
+                            onClick={() => {
+                                if (id.startsWith('p-')) return;
+                                const newRest = Math.max(0, (routine.roundRest || 0) - 5);
+                                updateRoutine({ ...routine, roundRest: newRest });
+                            }}
+                            className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-90"
+                        >
+                            <span className="text-lg md:text-xl font-light">-</span>
+                        </button>
+                        <span className="text-lg md:text-2xl font-black text-white min-w-[1.2rem] md:min-w-[2.5rem] text-center tabular-nums">
+                            {routine.roundRest ?? 0}s
+                        </span>
+                        <button 
+                            onClick={() => {
+                                if (id.startsWith('p-')) return;
+                                const newRest = (routine.roundRest ?? 0) + 5;
+                                updateRoutine({ ...routine, roundRest: newRest });
+                            }}
+                            className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-600 flex items-center justify-center text-white hover:bg-emerald-500 transition-all active:scale-90"
+                        >
+                            <span className="text-lg md:text-xl font-light">+</span>
                         </button>
                     </div>
                 </div>
@@ -450,32 +536,35 @@ export default function RoutineDetail() {
                 </SortableContext>
               </DndContext>
 
-              <button 
-                onClick={() => router.push(`/routine/${id}/select`)}
-                className="w-full py-5 border-2 border-dashed border-slate-800 rounded-2xl flex items-center justify-center gap-2 text-slate-500 hover:text-purple-500 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all mt-6"
-              >
-                <Plus className="w-5 h-5" />
-                <span className="font-bold">운동 추가하기</span>
-              </button>
+              {!id.startsWith('p-') && (
+                <button 
+                  onClick={() => router.push(`/routine/${id}/select`)}
+                  className="w-full py-5 border-2 border-dashed border-slate-800 rounded-2xl flex items-center justify-center gap-2 text-slate-500 hover:text-purple-500 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all mt-6"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="font-bold">운동 추가하기</span>
+                </button>
+              )}
             </section>
 
             </motion.div>
           ) : (
             <motion.div 
-              key="timer"
+              key={`timer-${routine.id}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
               className="fixed inset-0 z-[100] bg-slate-950"
             >
               <TimerDisplay 
+                  key={`display-${routine.id}-${exerciseData.length}`}
                   status={timer.status}
                   timeLeft={timer.timeLeft}
                   totalTimeForStep={timer.totalTimeForStep}
                   currentRound={timer.currentRound}
                   totalRounds={timer.totalRounds}
                   currentExercise={timer.currentExercise}
-                  nextExercise={timer.nextExercise}
+                  nextExercise={timer.nextExercise || (timer.currentRound < timer.totalRounds ? routineExercises[0] : null)}
                   onToggle={() => {
                       if (timer.status === 'paused') timer.start();
                       else timer.pause();
@@ -491,6 +580,7 @@ export default function RoutineDetail() {
                   }}
                   isMusicMuted={isMusicMuted}
                   onToggleMusic={() => setIsMusicMuted(!isMusicMuted)}
+                  isSetRest={timer.status === 'resting' && timer.currentIndex === (routineExercises.length - 1)}
               />
             </motion.div>
           )}
@@ -501,15 +591,15 @@ export default function RoutineDetail() {
             <div className="max-w-4xl mx-auto w-full px-4 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-12 pointer-events-auto">
                 <button 
                     onClick={() => {
-                        if (routine.exercises.length === 0) return;
+                        if (routine.exercises.length === 0 || exerciseData.length === 0) return;
                         setIsTimerMode(true);
                         timer.start();
                     }}
-                    disabled={routine.exercises.length === 0}
+                    disabled={routine.exercises.length === 0 || exerciseData.length === 0}
                     className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black rounded-2xl shadow-2xl shadow-purple-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
                 >
                     <Play className="w-6 h-6 fill-white" />
-                    운동 시작하기
+                    {exerciseData.length === 0 ? '데이터 로딩 중...' : '운동 시작하기'}
                 </button>
             </div>
           </div>

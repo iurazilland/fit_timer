@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Play, Trash2, Clock, Dumbbell, ChevronRight, X } from 'lucide-react';
+import { Plus, Play, Trash2, Clock, Dumbbell, ChevronRight, X, Sparkles, Flame, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRoutines } from '@/hooks/useRoutines';
 import SwipeableCard from '@/components/SwipeableCard';
@@ -12,6 +12,7 @@ export default function Home() {
   const { routines, isLoaded, addRoutine, deleteRoutine } = useRoutines();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRoutineName, setNewRoutineName] = useState('');
+  const [recommendedRoutines, setRecommendedRoutines] = useState<any[]>([]);
 
   const handleCreateRoutine = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,11 +25,19 @@ export default function Home() {
   };
 
   const calculateTotalTime = (routine: any) => {
-    const totalSeconds = routine.exercises.reduce((acc: number, ex: any) => acc + ex.workTime + ex.restTime, 0);
+    const totalSecondsPerRound = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
+    const totalSeconds = totalSecondsPerRound * (routine.rounds || 1);
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
     return `${mins}분 ${secs}초`;
   };
+
+  React.useEffect(() => {
+    fetch('/data/default_routines.json')
+      .then(res => res.json())
+      .then(data => setRecommendedRoutines(data))
+      .catch(err => console.error('Failed to load recommended routines:', err));
+  }, []);
 
   if (!isLoaded) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-500">Loading...</div>;
 
@@ -40,10 +49,85 @@ export default function Home() {
           <h1 className="text-3xl font-black tracking-tighter text-white">HOMEFIT <span className="text-purple-500">TIMER</span></h1>
           <p className="text-slate-500 text-sm font-medium mt-1">나만의 루틴으로 건강을 관리하세요</p>
         </div>
-        <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center border border-slate-800">
-          <Dumbbell className="w-6 h-6 text-purple-500" />
-        </div>
       </header>
+
+      <section className="mb-12">
+        <h2 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
+            <span className="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
+            추천 루틴 프로그램
+        </h2>
+        <div className="grid gap-4">
+          {recommendedRoutines.map((routine) => (
+            <motion.div
+              key={routine.id}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-6 rounded-[2rem] transition-all cursor-pointer group relative overflow-hidden ${
+                routine.id === 'p-stretching' ? 'hover:border-emerald-500/30 shadow-emerald-500/5' :
+                routine.id === 'p-foundation' ? 'hover:border-blue-500/30 shadow-blue-500/5' :
+                routine.id === 'p-cardio' ? 'hover:border-orange-500/30 shadow-orange-500/5' :
+                'hover:border-purple-500/30 shadow-purple-500/5'
+              } hover:shadow-2xl`}
+              onClick={() => router.push(`/routine/${routine.id}`)}
+            >
+              <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-4">
+                  {/* Icon Box with Dynamic Color Handling */}
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 ${
+                    routine.id === 'p-stretching' ? 'bg-gradient-to-br from-emerald-400 to-teal-500 shadow-emerald-500/20' :
+                    routine.id === 'p-foundation' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/20' :
+                    routine.id === 'p-cardio' ? 'bg-gradient-to-br from-orange-400 to-red-500 shadow-orange-500/20' :
+                    'bg-gradient-to-br from-purple-600 to-slate-900 shadow-purple-500/20'
+                  }`}>
+                    {routine.icon === 'Sparkles' && <Sparkles className="w-6 h-6 text-white fill-white" />}
+                    {routine.icon === 'Dumbbell' && <Dumbbell className="w-6 h-6 text-white" />}
+                    {routine.icon === 'Flame' && <Flame className="w-6 h-6 text-white fill-white" />}
+                    {routine.icon === 'Zap' && <Zap className="w-6 h-6 text-white fill-white" />}
+                    {!routine.icon && <Play className="w-6 h-6 text-white fill-white" />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className={`text-xl font-bold text-white transition-colors ${
+                        routine.id === 'p-stretching' ? 'group-hover:text-emerald-400' :
+                        routine.id === 'p-foundation' ? 'group-hover:text-blue-400' :
+                        routine.id === 'p-cardio' ? 'group-hover:text-orange-400' :
+                        'group-hover:text-purple-400'
+                      }`}>{routine.title}</h3>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">
+                        <Clock className="w-3 h-3" /> 
+                        {(() => {
+                          const sumWorkRest = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30) + (ex.restTime || 10), 0);
+                          const lastRest = routine.exercises.length > 0 ? (routine.exercises[routine.exercises.length - 1].restTime || 10) : 0;
+                          const roundRest = routine.roundRest ?? 0;
+                          const rounds = routine.rounds || 1;
+                          
+                          const totalSeconds = rounds > 1 
+                            ? (sumWorkRest - lastRest + roundRest) * (rounds - 1) + (sumWorkRest - lastRest)
+                            : (sumWorkRest - lastRest);
+                            
+                          return `${Math.floor(totalSeconds / 60)}분 ${totalSeconds % 60}초`;
+                        })()}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">
+                        <Dumbbell className="w-3 h-3" /> {routine.exercises.length}개 운동
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <ChevronRight className="w-6 h-6 text-slate-700 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                </div>
+              </div>
+              
+              {/* Decorative Background */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-colors"></div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       <section className="flex-1">
         <h2 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
