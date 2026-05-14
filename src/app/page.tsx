@@ -33,7 +33,7 @@ export default function Home() {
   if (!isLoaded) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-500">Loading...</div>;
 
   return (
-    <main className="max-w-md mx-auto min-h-screen flex flex-col px-6 py-6">
+    <main className="max-w-md mx-auto min-h-screen flex flex-col px-4 md:px-6 py-6">
       <header className="py-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black tracking-tighter text-white">HOMEFIT <span className="text-purple-500">TIMER</span></h1>

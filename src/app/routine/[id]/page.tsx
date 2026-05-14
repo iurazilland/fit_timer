@@ -164,7 +164,7 @@ function ExerciseCardContent({
       const finalSrc = assetPath ? (assetPath.startsWith('/') ? assetPath : `/${assetPath}`) : null;
 
       return (
-          <div className="bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2.5 rounded-3xl flex items-center gap-3 group hover:border-slate-700 transition-all">
+          <div className="bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-3 rounded-3xl flex items-center gap-2 md:gap-3 group hover:border-slate-700 transition-all">
               <div className="relative w-16 h-16 bg-slate-950 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5">
                   {finalSrc ? (
                       <img 
@@ -191,19 +191,19 @@ function ExerciseCardContent({
               <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-white text-base leading-tight mb-1.5 truncate tracking-tight">{base ? (base.name_ko || base.name) : 'Unknown Exercise'}</h4>
                   <div className="flex items-center gap-2">
-                      <div className="flex flex-col items-start bg-emerald-500/5 border border-emerald-500/10 px-3 py-1.5 rounded-xl">
+                      <div className="flex flex-col items-start bg-emerald-500/5 border border-emerald-500/10 px-2 md:px-3 py-1 md:py-1.5 rounded-xl">
                           <span className="text-[9px] font-black text-emerald-500/50 uppercase tracking-tighter leading-none mb-0.5">운동</span>
                           <span className="text-sm font-black text-emerald-400">{re.workTime}S</span>
                       </div>
                       
-                      <div className="flex flex-col items-start bg-amber-500/5 border border-amber-500/10 px-3 py-1.5 rounded-xl">
+                      <div className="flex flex-col items-start bg-amber-500/5 border border-amber-500/10 px-2 md:px-3 py-1 md:py-1.5 rounded-xl">
                           <span className="text-[9px] font-black text-amber-500/50 uppercase tracking-tighter leading-none mb-0.5">휴식</span>
                           <span className="text-sm font-black text-amber-400">{re.restTime}S</span>
                       </div>
                   </div>
               </div>
   
-              <div className="pr-2" {...(dragHandleProps || {})}>
+              <div className="pr-2 flex-shrink-0" {...(dragHandleProps || {})}>
                   <div className="p-2 text-slate-800 cursor-grab active:cursor-grabbing hover:text-slate-400 transition-colors">
                       <GripVertical className="w-5 h-5" />
                   </div>
@@ -314,7 +314,7 @@ export default function RoutineDetail() {
   const totalSecs = totalSeconds % 60;
 
   return (
-    <main className="max-w-md mx-auto min-h-screen flex flex-col px-6">
+    <main className="max-w-md mx-auto min-h-screen flex flex-col px-4 md:px-6">
       <AnimatePresence mode="wait">
         {!isTimerMode ? (
           <motion.div 
@@ -346,7 +346,7 @@ export default function RoutineDetail() {
               </button>
             </header>
 
-            <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 mb-10 flex items-center justify-between shadow-2xl shadow-black/20">
+            <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-5 md:p-8 mb-10 flex items-center justify-between shadow-2xl shadow-black/20">
                 {/* Total Time Section */}
                 <div className="flex-1 min-w-0 flex flex-col items-start gap-1">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">총 운동 시간</p>
@@ -362,7 +362,7 @@ export default function RoutineDetail() {
                     </div>
                 </div>
 
-                <div className="w-px h-12 bg-gradient-to-b from-transparent via-slate-800 to-transparent mx-8 opacity-50"></div>
+                <div className="w-px h-12 bg-gradient-to-b from-transparent via-slate-800 to-transparent mx-3 md:mx-8 opacity-50"></div>
 
                 {/* Rounds Selector Section */}
                 <div className="flex-1 flex flex-col items-end gap-2">
@@ -377,7 +377,7 @@ export default function RoutineDetail() {
                         >
                             <span className="text-xl font-light">-</span>
                         </button>
-                        <span className="text-2xl font-black text-white min-w-[3rem] text-center tabular-nums">
+                        <span className="text-xl md:text-2xl font-black text-white min-w-[2rem] md:min-w-[3rem] text-center tabular-nums">
                             {routine.rounds || 1}
                         </span>
                         <button 
