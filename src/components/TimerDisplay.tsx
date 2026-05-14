@@ -16,6 +16,7 @@ interface TimerDisplayProps {
   onToggle: () => void;
   onReset: () => void;
   onRestartStep: () => void;
+  onNextStep?: () => void;
   onPrevStep?: () => void;
   currentIndex?: number;
   version?: number;
