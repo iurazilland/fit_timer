@@ -155,9 +155,10 @@ export default function TimerDisplay({
 
                     <div className="h-4 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                         <motion.div 
+                            key={`${currentIndex}-${status}-${currentRound}`}
                             initial={{ width: '100%' }}
                             animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.1, ease: "easeOut" }}
+                            transition={{ duration: 1, ease: "linear" }}
                             className={`h-full rounded-full ${
                                 isWorking ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 
                                 isPreparing ? 'bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' :
