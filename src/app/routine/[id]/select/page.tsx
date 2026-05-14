@@ -181,7 +181,7 @@ export default function ExerciseSelection() {
   if (!isLoaded) return null;
 
   return (
-    <main className="max-w-xl mx-auto min-h-screen flex flex-col px-3 md:px-6 py-6 pb-32">
+    <main className="max-w-4xl mx-auto min-h-screen flex flex-col px-4 md:px-6 py-6 pb-32 w-full">
       <header className="flex items-center gap-4 mb-8">
         <button 
           onClick={() => router.push(`/routine/${id}`)}
@@ -229,7 +229,7 @@ export default function ExerciseSelection() {
         <div className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none" />
       </div>
 
-      <div className="grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-2 w-full min-w-0">
         {isLoading ? (
             <div className="py-20 flex flex-col items-center justify-center">
                 <motion.div 

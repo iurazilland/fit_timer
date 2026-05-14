@@ -135,7 +135,7 @@ function SortableItem({ id, children, isDragging: isDndDragging }: { id: string,
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={isDragging ? 'opacity-50' : ''}>
+    <div ref={setNodeRef} style={style} className={`w-full min-w-0 ${isDragging ? 'opacity-50' : ''}`}>
         {React.Children.map(children, child => {
             if (React.isValidElement(child)) {
                 return React.cloneElement(child as React.ReactElement<any>, { 
@@ -314,7 +314,7 @@ export default function RoutineDetail() {
   const totalSecs = totalSeconds % 60;
 
   return (
-    <main className="max-w-xl mx-auto min-h-screen flex flex-col px-3 md:px-6">
+    <main className="max-w-4xl mx-auto min-h-screen flex flex-col px-4 md:px-6">
       <AnimatePresence mode="wait">
         {!isTimerMode ? (
           <motion.div 
@@ -346,7 +346,7 @@ export default function RoutineDetail() {
               </button>
             </header>
 
-            <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-5 md:p-8 mb-10 flex items-center justify-between shadow-2xl shadow-black/20">
+            <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-4 md:p-8 mb-10 flex items-center justify-between shadow-2xl shadow-black/20">
                 {/* Total Time Section */}
                 <div className="flex-1 min-w-0 flex flex-col items-start gap-1">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">총 운동 시간</p>
@@ -362,7 +362,7 @@ export default function RoutineDetail() {
                     </div>
                 </div>
 
-                <div className="w-px h-12 bg-gradient-to-b from-transparent via-slate-800 to-transparent mx-3 md:mx-8 opacity-50"></div>
+                <div className="w-px h-12 bg-gradient-to-b from-transparent via-slate-800 to-transparent mx-2 md:mx-8 opacity-50"></div>
 
                 {/* Rounds Selector Section */}
                 <div className="flex-1 flex flex-col items-end gap-2">
@@ -410,7 +410,7 @@ export default function RoutineDetail() {
                   items={routine.exercises.map((ex: any) => ex.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-3 w-full">
                     {isLoading ? (
                         <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-slate-800 rounded-[2rem] text-slate-600">
                             <motion.div 
@@ -458,7 +458,7 @@ export default function RoutineDetail() {
               </button>
             </section>
 
-            <div className="fixed bottom-0 left-0 right-0 px-3 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 z-50">
+            <div className="fixed bottom-0 left-0 right-0 px-4 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 z-50">
                 <button 
                     onClick={() => {
                         if (routine.exercises.length === 0) return;
