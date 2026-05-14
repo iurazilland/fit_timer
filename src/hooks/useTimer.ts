@@ -83,8 +83,8 @@ export const useTimer = ({
         setTimeLeft((prev) => {
           if (prev <= 0) return 0;
           
-          // Beep 3 seconds before ending
-          if (prev <= 4 && prev > 1) {
+          // Beep 5 seconds before ending
+          if (prev <= 6 && prev > 1) {
             beep('prepare');
           }
           
