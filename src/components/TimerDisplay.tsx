@@ -157,7 +157,7 @@ export default function TimerDisplay({
                         <motion.div 
                             initial={{ width: '100%' }}
                             animate={{ width: `${progress}%` }}
-                            transition={{ duration: 1, ease: "linear" }}
+                            transition={{ duration: 0.1, ease: "easeOut" }}
                             className={`h-full rounded-full ${
                                 isWorking ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 
                                 isPreparing ? 'bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' :
