@@ -148,7 +148,7 @@ export const useTimer = ({
             }
           }
           
-          if (prev <= 4 && prev > 1) {
+          if (prev <= 6 && prev > 1) {
             beep?.('prepare');
           }
           
