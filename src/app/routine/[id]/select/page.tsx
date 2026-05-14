@@ -49,11 +49,11 @@ function AddExerciseModal({
             >
                 {/* Header with Visuals */}
                 <div className="p-8 pb-4 flex flex-col items-center">
-                    <div className="w-32 h-32 bg-slate-950 rounded-[2rem] overflow-hidden border border-white/5 mb-4 shadow-xl">
+                    <div className="w-32 h-32 bg-white rounded-[2rem] overflow-hidden mb-4 shadow-xl border border-white/5">
                         <img 
                             src={exercise.gif_url ? (exercise.gif_url.startsWith('/') ? exercise.gif_url : `/${exercise.gif_url}`) : ''} 
                             alt={exercise.name} 
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                         />
                     </div>
                     <h3 className="text-2xl font-black text-white text-center leading-tight capitalize">{exercise.name}</h3>
@@ -296,11 +296,11 @@ export default function ExerciseSelection() {
                       className="w-full min-w-0 bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-2.5 rounded-3xl flex items-center gap-2 md:gap-3 cursor-pointer hover:border-purple-500/30 transition-all group"
                       onClick={() => setSelectingExercise(ex)}
                     >
-                      <div className="relative w-16 h-16 rounded-2xl bg-slate-950 overflow-hidden border border-white/5 flex-shrink-0">
+                      <div className="relative w-16 h-16 rounded-2xl bg-white overflow-hidden border border-white/5 flex-shrink-0">
                         <img 
-                            src={ex.image ? (ex.image.startsWith('/') ? ex.image : `/${ex.image}`) : ''} 
+                            src={ex.gif_url ? (ex.gif_url.startsWith('/') ? ex.gif_url : `/${ex.gif_url}`) : ''} 
                             alt={ex.name} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                             loading="lazy"
                             onError={(e) => {
                                 const target = e.target as HTMLImageElement;
