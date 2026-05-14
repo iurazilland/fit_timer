@@ -164,7 +164,7 @@ function ExerciseCardContent({
       const finalSrc = assetPath ? (assetPath.startsWith('/') ? assetPath : `/${assetPath}`) : null;
 
       return (
-          <div className="bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-3 rounded-3xl flex items-center gap-2 md:gap-3 group hover:border-slate-700 transition-all">
+          <div className="w-full min-w-0 bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-3 rounded-3xl flex items-center gap-2 md:gap-3 group hover:border-slate-700 transition-all">
               <div className="relative w-16 h-16 bg-slate-950 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5">
                   {finalSrc ? (
                       <img 
@@ -314,7 +314,7 @@ export default function RoutineDetail() {
   const totalSecs = totalSeconds % 60;
 
   return (
-    <main className="max-w-md mx-auto min-h-screen flex flex-col px-4 md:px-6">
+    <main className="max-w-xl mx-auto min-h-screen flex flex-col px-3 md:px-6">
       <AnimatePresence mode="wait">
         {!isTimerMode ? (
           <motion.div 
@@ -332,7 +332,7 @@ export default function RoutineDetail() {
                 >
                   <ArrowLeft className="w-6 h-6" />
                 </button>
-                <h1 className="text-2xl font-black text-white">{routine.name}</h1>
+                <h1 className="text-2xl font-black text-white truncate max-w-[200px] md:max-w-none">{routine.name}</h1>
               </div>
               <button 
                 onClick={() => setIsMusicMuted(!isMusicMuted)}
@@ -458,7 +458,7 @@ export default function RoutineDetail() {
               </button>
             </section>
 
-            <div className="fixed bottom-0 left-0 right-0 px-4 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 z-50">
+            <div className="fixed bottom-0 left-0 right-0 px-3 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 z-50">
                 <button 
                     onClick={() => {
                         if (routine.exercises.length === 0) return;

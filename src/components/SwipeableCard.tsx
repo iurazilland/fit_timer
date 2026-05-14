@@ -90,7 +90,7 @@ export default function SwipeableCard({ children, onDelete, onEdit, id, dragHand
         dragElastic={0.1}
         style={{ x }}
         onDragEnd={handleDragEnd}
-        className="relative z-10 bg-slate-950 w-full cursor-grab active:cursor-grabbing"
+        className="relative z-10 bg-slate-950 w-full min-w-0 cursor-grab active:cursor-grabbing"
       >
         {React.Children.map(children, child => {
             if (React.isValidElement(child)) {

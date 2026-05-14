@@ -181,7 +181,7 @@ export default function ExerciseSelection() {
   if (!isLoaded) return null;
 
   return (
-    <main className="max-w-md mx-auto min-h-screen flex flex-col px-4 md:px-6 py-6 pb-32">
+    <main className="max-w-xl mx-auto min-h-screen flex flex-col px-3 md:px-6 py-6 pb-32">
       <header className="flex items-center gap-4 mb-8">
         <button 
           onClick={() => router.push(`/routine/${id}`)}
@@ -248,7 +248,7 @@ export default function ExerciseSelection() {
                     <motion.div
                       key={ex.id}
                       whileTap={{ scale: 0.98 }}
-                      className="bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-2.5 rounded-3xl flex items-center gap-2 md:gap-3 cursor-pointer hover:border-purple-500/30 transition-all group"
+                      className="w-full min-w-0 bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 p-2 md:p-2.5 rounded-3xl flex items-center gap-2 md:gap-3 cursor-pointer hover:border-purple-500/30 transition-all group"
                       onClick={() => setSelectingExercise(ex)}
                     >
                       <div className="relative w-16 h-16 rounded-2xl bg-slate-950 overflow-hidden border border-white/5 flex-shrink-0">
@@ -266,9 +266,9 @@ export default function ExerciseSelection() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-white text-sm leading-snug mb-1 truncate">{ex.name}</h3>
-                        <div className="flex gap-1.5">
-                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest bg-slate-950/50 px-2 py-0.5 rounded-md border border-slate-800">{ex.body_part}</span>
-                            <span className="text-[8px] font-black text-purple-500/70 uppercase tracking-widest bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10">{translate(ex.equipment)}</span>
+                        <div className="flex flex-wrap gap-1.5">
+                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest bg-slate-950/50 px-2 py-0.5 rounded-md border border-slate-800 truncate max-w-[80px]">{ex.body_part}</span>
+                            <span className="text-[8px] font-black text-purple-500/70 uppercase tracking-widest bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10 truncate max-w-[80px]">{translate(ex.equipment)}</span>
                         </div>
                       </div>
                       <div className="w-8 h-8 rounded-xl bg-slate-950 text-slate-700 flex items-center justify-center border border-slate-800 group-hover:text-purple-500 group-hover:border-purple-500/30 transition-all flex-shrink-0">

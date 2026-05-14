@@ -90,13 +90,15 @@ export const useAudio = () => {
 
     switch (status) {
       case 'working':
-        fadeAudio(workAudio.current, 0.2);
+        if (workAudio.current) workAudio.current.currentTime = 0;
+        fadeAudio(workAudio.current, 0.08);
         fadeAudio(restAudio.current, 0);
         break;
       case 'resting':
       case 'preparing':
+        if (restAudio.current) restAudio.current.currentTime = 0;
         fadeAudio(workAudio.current, 0);
-        fadeAudio(restAudio.current, 0.15);
+        fadeAudio(restAudio.current, 0.05);
         break;
     }
   }, []);
