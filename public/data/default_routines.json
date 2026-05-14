@@ -116,7 +116,7 @@
     "desc": "최대 근력과 지구력을 요구하는 챌린지 프로그램",
     "color": "from-purple-600 to-slate-900",
     "icon": "Zap",
-    "rounds": 4,
+    "rounds": 3,
     "roundRest": 20,
     "exercises": [
       {
