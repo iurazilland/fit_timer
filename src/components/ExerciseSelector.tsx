@@ -36,9 +36,9 @@ export default function ExerciseSelector({ onSelect, selectedIds, onClose }: Exe
 
   const filteredExercises = exercises.filter(ex => {
     const matchesSearch = 
-      ex.name.toLowerCase().includes(search.toLowerCase()) ||
-      ex.name_ko.toLowerCase().includes(search.toLowerCase()) ||
-      ex.body_part_ko?.includes(search);
+      (ex.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (ex.name_ko || '').toLowerCase().includes(search.toLowerCase()) ||
+      (ex.body_part_ko || '').includes(search);
 
     if (!matchesSearch) return false;
     if (activeCategory === 'all') return true;
