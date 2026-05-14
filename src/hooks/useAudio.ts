@@ -133,7 +133,7 @@ export const useAudio = () => {
     }
   }, []);
 
-  const notify = useCallback((type: 'prepare' | 'start' | 'stop') => {
+  const notify = useCallback((type: 'prepare' | 'start' | 'stop' | 'rest') => {
     switch (type) {
       case 'prepare':
         playBeep(440, 0.1);
@@ -142,6 +142,7 @@ export const useAudio = () => {
         playBeep(880, 0.3);
         break;
       case 'stop':
+      case 'rest':
         playBeep(220, 0.3);
         break;
     }
