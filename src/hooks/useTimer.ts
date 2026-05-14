@@ -165,9 +165,117 @@ export const useTimer = ({
     const { currentIndex: idx, exercises: exs, workDuration: wd, restDuration: rd, status: s } = stateRef.current;
     const initialTime = s === 'working' 
         ? (exs[idx]?.workTime ?? wd)
-        : (exs[idx]?.restTime ?? rd);
+        : (s === 'preparing' ? 10 : (exs[idx]?.restTime ?? rd));
     setTimeLeft(initialTime);
   }, []);
+
+  const nextStep = useCallback(() => {
+    const { 
+        status: s, 
+        currentIndex: idx, 
+        currentRound: cr,
+        rounds: tr,
+        exercises: exs, 
+        workDuration: wd, 
+        restDuration: rd,
+        onBeep: beep 
+    } = stateRef.current;
+
+    if (s === 'preparing') {
+        setStatus('working');
+        setLastActiveStatus('working');
+        beep?.('start');
+        setTimeLeft(exs[0]?.workTime ?? wd);
+    } else if (s === 'working') {
+        if (idx < exs.length - 1) {
+            setStatus('resting');
+            setLastActiveStatus('resting');
+            beep?.('stop');
+            setTimeLeft(exs[idx]?.restTime ?? rd);
+        } else if (cr < tr) {
+            setStatus('resting');
+            setLastActiveStatus('resting');
+            beep?.('stop');
+            setTimeLeft(exs[idx]?.restTime ?? rd);
+        } else {
+            setStatus('finished');
+            beep?.('stop');
+            setTimeLeft(0);
+        }
+    } else if (s === 'resting') {
+        if (idx < exs.length - 1) {
+            const nextIdx = idx + 1;
+            setCurrentIndex(nextIdx);
+            setStatus('working');
+            setLastActiveStatus('working');
+            beep?.('start');
+            setTimeLeft(exs[nextIdx]?.workTime ?? wd);
+        } else {
+            setCurrentIndex(0);
+            setCurrentRound(prev => prev + 1);
+            setStatus('working');
+            setLastActiveStatus('working');
+            beep?.('start');
+            setTimeLeft(exs[0]?.workTime ?? wd);
+        }
+    }
+  }, []);
+
+  const prevStep = useCallback(() => {
+    const { 
+        status: s, 
+        currentIndex: idx, 
+        currentRound: cr,
+        exercises: exs, 
+        workDuration: wd, 
+        restDuration: rd 
+    } = stateRef.current;
+
+    const currentTotal = s === 'working' 
+        ? (exs[idx]?.workTime ?? wd)
+        : (s === 'preparing' ? 10 : (exs[idx]?.restTime ?? rd));
+    
+    const elapsed = currentTotal - timeLeft;
+
+    // 만약 3초 이상 경과했다면 현재 단계를 처음부터 재생 (음악 재생 앱 방식)
+    if (elapsed > 3) {
+        restartStep();
+        return;
+    }
+
+    // 3초 미만이라면 이전 단계로 이동
+    if (s === 'preparing') {
+        restartStep(); // 준비 단계는 이전이 없으므로 재시작
+    } else if (s === 'working') {
+        if (idx > 0) {
+            // 이전 휴식 단계로
+            const prevIdx = idx - 1;
+            setCurrentIndex(prevIdx);
+            setStatus('resting');
+            setLastActiveStatus('resting');
+            setTimeLeft(exs[prevIdx]?.restTime ?? rd);
+        } else if (cr > 1) {
+            // 이전 라운드의 마지막 휴식 단계로
+            const lastIdx = exs.length - 1;
+            setCurrentIndex(lastIdx);
+            setCurrentRound(cr - 1);
+            setStatus('resting');
+            setLastActiveStatus('resting');
+            setTimeLeft(exs[lastIdx]?.restTime ?? rd);
+        } else {
+            // 처음이라면 준비 단계로
+            setCurrentIndex(0);
+            setStatus('preparing');
+            setLastActiveStatus('preparing');
+            setTimeLeft(10);
+        }
+    } else if (s === 'resting') {
+        // 현재 운동의 운동 단계로
+        setStatus('working');
+        setLastActiveStatus('working');
+        setTimeLeft(exs[idx]?.workTime ?? wd);
+    }
+  }, [timeLeft, restartStep]);
 
   const currentTotalTime = status === 'working' 
     ? (exercises[currentIndex]?.workTime ?? workDuration)
@@ -184,6 +292,8 @@ export const useTimer = ({
     pause,
     reset,
     restartStep,
+    nextStep,
+    prevStep,
     currentExercise: exercises[currentIndex],
     nextExercise: exercises[currentIndex + 1]
   };

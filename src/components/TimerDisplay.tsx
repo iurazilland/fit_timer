@@ -16,6 +16,8 @@ interface TimerDisplayProps {
   onToggle: () => void;
   onReset: () => void;
   onRestartStep: () => void;
+  onNextStep?: () => void;
+  onPrevStep?: () => void;
   isMusicMuted?: boolean;
   onToggleMusic?: () => void;
 }
@@ -31,6 +33,8 @@ export default function TimerDisplay({
   onToggle,
   onReset,
   onRestartStep,
+  onNextStep,
+  onPrevStep,
   isMusicMuted,
   onToggleMusic
 }: TimerDisplayProps) {
@@ -165,11 +169,11 @@ export default function TimerDisplay({
 
                 <div className="flex items-center justify-between gap-4 mt-2">
                     <button 
-                        onClick={onRestartStep}
+                        onClick={onPrevStep}
                         className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-500 hover:text-white transition-all active:scale-95"
                     >
-                        <RotateCcw className="w-5 h-5 mb-1" />
-                        <span className="text-[10px] font-bold">RESTART</span>
+                        <SkipForward className="w-5 h-5 mb-1 rotate-180" />
+                        <span className="text-[10px] font-bold">PREV</span>
                     </button>
                     
                     <button 
@@ -193,9 +197,12 @@ export default function TimerDisplay({
                         )}
                     </button>
 
-                    <button className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-500 hover:text-white transition-all active:scale-95">
+                    <button 
+                        onClick={onNextStep}
+                        className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-500 hover:text-white transition-all active:scale-95"
+                    >
                         <SkipForward className="w-5 h-5 mb-1" />
-                        <span className="text-[10px] font-bold">SKIP</span>
+                        <span className="text-[10px] font-bold">NEXT</span>
                     </button>
                 </div>
             </div>

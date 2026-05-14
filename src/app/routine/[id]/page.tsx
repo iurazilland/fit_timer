@@ -481,6 +481,8 @@ export default function RoutineDetail() {
                       else timer.pause();
                   }}
                   onRestartStep={timer.restartStep}
+                  onNextStep={timer.nextStep}
+                  onPrevStep={timer.prevStep}
                   onReset={() => {
                       timer.reset();
                       setIsTimerMode(false);
