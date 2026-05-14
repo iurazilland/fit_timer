@@ -58,9 +58,9 @@ export default function TimerDisplay({
       </button>
 
       {/* Center Round Indicator */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[110] px-5 h-10 bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-full flex items-center justify-center text-white/90 shadow-lg shadow-black/20">
-        <span className="text-[10px] font-black tracking-[0.2em] uppercase">
-            ROUND <span className="text-white ml-1.5">{currentRound}</span> / {totalRounds}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[110] px-6 h-12 bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-full flex items-center justify-center text-white shadow-lg shadow-black/20">
+        <span className="text-xl font-black tabular-nums">
+            {currentRound} <span className="text-sm text-slate-500 mx-1">/</span> {totalRounds}
         </span>
       </div>
 
