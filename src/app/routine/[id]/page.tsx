@@ -484,6 +484,7 @@ export default function RoutineDetail() {
                   onNextStep={timer.nextStep}
                   onPrevStep={timer.prevStep}
                   currentIndex={timer.currentIndex}
+                  version={timer.version}
                   onReset={() => {
                       timer.reset();
                       setIsTimerMode(false);

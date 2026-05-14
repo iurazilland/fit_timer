@@ -26,6 +26,7 @@ export const useTimer = ({
   const [currentRound, setCurrentRound] = useState(1);
   const [timeLeft, setTimeLeft] = useState(0);
   const [lastActiveStatus, setLastActiveStatus] = useState<'working' | 'resting' | 'preparing'>('working');
+  const [version, setVersion] = useState(0);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -161,12 +162,17 @@ export const useTimer = ({
     };
   }, [status]); // Only re-run when status changes
 
+  useEffect(() => {
+    setVersion(v => v + 1);
+  }, [status, currentIndex, currentRound]);
+
   const restartStep = useCallback(() => {
     const { currentIndex: idx, exercises: exs, workDuration: wd, restDuration: rd, status: s } = stateRef.current;
     const initialTime = s === 'working' 
         ? (exs[idx]?.workTime ?? wd)
         : (s === 'preparing' ? 10 : (exs[idx]?.restTime ?? rd));
     setTimeLeft(initialTime);
+    setVersion(v => v + 1);
   }, []);
 
   const nextStep = useCallback(() => {
@@ -294,6 +300,7 @@ export const useTimer = ({
     restartStep,
     nextStep,
     prevStep,
+    version,
     currentExercise: exercises[currentIndex],
     nextExercise: exercises[currentIndex + 1]
   };
