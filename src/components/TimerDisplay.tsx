@@ -18,6 +18,7 @@ interface TimerDisplayProps {
   onRestartStep: () => void;
   onNextStep?: () => void;
   onPrevStep?: () => void;
+  currentIndex?: number;
   isMusicMuted?: boolean;
   onToggleMusic?: () => void;
 }
@@ -35,6 +36,7 @@ export default function TimerDisplay({
   onRestartStep,
   onNextStep,
   onPrevStep,
+  currentIndex,
   isMusicMuted,
   onToggleMusic
 }: TimerDisplayProps) {
@@ -155,7 +157,7 @@ export default function TimerDisplay({
 
                     <div className="h-4 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                         <motion.div 
-                            key={`${currentIndex}-${status}-${currentRound}`}
+                            key={`${currentIndex || 0}-${status}-${currentRound}`}
                             initial={{ width: '100%' }}
                             animate={{ width: `${progress}%` }}
                             transition={{ duration: 1, ease: "linear" }}
