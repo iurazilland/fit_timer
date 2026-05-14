@@ -181,7 +181,8 @@ export default function ExerciseSelection() {
   if (!isLoaded) return null;
 
   return (
-    <main className="max-w-4xl mx-auto min-h-screen flex flex-col px-4 md:px-6 py-6 pb-32 w-full">
+    <main className="w-full min-h-screen bg-slate-950 flex flex-col items-center">
+      <div className="w-full max-w-4xl flex flex-col min-h-screen relative px-4 md:px-6 py-6 pb-32">
       <header className="flex items-center gap-4 mb-8">
         <button 
           onClick={() => router.push(`/routine/${id}`)}
@@ -298,6 +299,7 @@ export default function ExerciseSelection() {
             />
         )}
       </AnimatePresence>
+      </div>
     </main>
   );
 }

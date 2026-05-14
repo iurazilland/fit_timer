@@ -314,17 +314,18 @@ export default function RoutineDetail() {
   const totalSecs = totalSeconds % 60;
 
   return (
-    <main className="max-w-4xl mx-auto min-h-screen flex flex-col px-4 md:px-6">
-      <AnimatePresence mode="wait">
-        {!isTimerMode ? (
-          <motion.div 
-            key="setup"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="w-full flex-1 flex flex-col py-6 pb-32"
-          >
-            <header className="w-full py-6 flex items-center justify-between mb-2">
+    <main className="w-full min-h-screen bg-slate-950 flex flex-col items-center">
+      <div className="w-full max-w-4xl flex flex-col min-h-screen relative px-0">
+        <AnimatePresence mode="wait">
+          {!isTimerMode ? (
+            <motion.div 
+              key="setup"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full flex-1 flex flex-col py-6 pb-32 px-4 md:px-6"
+            >
+              <header className="w-full py-6 flex items-center justify-between mb-2">
               <div className="flex items-center gap-4">
                 <button 
                   onClick={() => router.push('/')}
@@ -458,7 +459,42 @@ export default function RoutineDetail() {
               </button>
             </section>
 
-            <div className="fixed bottom-0 left-0 right-0 px-4 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 z-50">
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="timer"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              className="fixed inset-0 z-[100] bg-slate-950"
+            >
+              <TimerDisplay 
+                  status={timer.status}
+                  timeLeft={timer.timeLeft}
+                  totalTimeForStep={timer.totalTimeForStep}
+                  currentRound={timer.currentRound}
+                  totalRounds={timer.totalRounds}
+                  currentExercise={timer.currentExercise}
+                  nextExercise={timer.nextExercise}
+                  onToggle={() => {
+                      if (timer.status === 'paused') timer.start();
+                      else timer.pause();
+                  }}
+                  onRestartStep={timer.restartStep}
+                  onReset={() => {
+                      timer.reset();
+                      setIsTimerMode(false);
+                  }}
+                  isMusicMuted={isMusicMuted}
+                  onToggleMusic={() => setIsMusicMuted(!isMusicMuted)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!isTimerMode && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
+            <div className="max-w-4xl mx-auto w-full px-4 md:px-6 py-6 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-12 pointer-events-auto">
                 <button 
                     onClick={() => {
                         if (routine.exercises.length === 0) return;
@@ -466,44 +502,15 @@ export default function RoutineDetail() {
                         timer.start();
                     }}
                     disabled={routine.exercises.length === 0}
-                    className="max-w-4xl mx-auto w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black rounded-2xl shadow-2xl shadow-purple-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
+                    className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black rounded-2xl shadow-2xl shadow-purple-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
                 >
                     <Play className="w-6 h-6 fill-white" />
                     운동 시작하기
                 </button>
             </div>
-          </motion.div>
-        ) : (
-          <motion.div 
-            key="timer"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            className="fixed inset-0 z-[100] bg-slate-950"
-          >
-            <TimerDisplay 
-                status={timer.status}
-                timeLeft={timer.timeLeft}
-                totalTimeForStep={timer.totalTimeForStep}
-                currentRound={timer.currentRound}
-                totalRounds={timer.totalRounds}
-                currentExercise={timer.currentExercise}
-                nextExercise={timer.nextExercise}
-                onToggle={() => {
-                    if (timer.status === 'paused') timer.start();
-                    else timer.pause();
-                }}
-                onRestartStep={timer.restartStep}
-                onReset={() => {
-                    timer.reset();
-                    setIsTimerMode(false);
-                }}
-                isMusicMuted={isMusicMuted}
-                onToggleMusic={() => setIsMusicMuted(!isMusicMuted)}
-            />
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
 
       <AnimatePresence>
         {editingExercise && (
