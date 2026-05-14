@@ -3,6 +3,7 @@ export interface ExerciseData {
   name: string;
   name_ko?: string;
   body_part: string;
+  body_part_ko?: string;
   equipment: string;
   gif_url: string;
 }
