@@ -225,19 +225,58 @@ export default function TimerDisplay({
             key="finished"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center h-full p-8"
+            className="flex flex-col items-center justify-center h-full p-8 text-center relative overflow-hidden"
           >
-            <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/30">
-              <Check className="w-12 h-12 text-white" />
+            {/* Floating Sparkles Background */}
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
+              />
+              <motion.div 
+                animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                className="absolute w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"
+              />
             </div>
-            <h2 className="text-5xl font-black text-white mb-4">AWESOME!</h2>
-            <p className="text-slate-400 text-lg mb-12">오늘의 루틴을 모두 완료했습니다.</p>
-            <button 
+
+            <motion.div 
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", damping: 12, stiffness: 100 }}
+              className="w-28 h-28 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/40 relative z-10"
+            >
+              <Check className="w-14 h-14 text-white stroke-[3]" />
+            </motion.div>
+            
+            <motion.h2 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-300 mb-4 tracking-tight relative z-10"
+            >
+              🎉 운동 완료를 축하합니다!
+            </motion.h2>
+            
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-slate-400 text-lg md:text-xl mb-12 max-w-md relative z-10 font-medium leading-relaxed"
+            >
+              오늘의 목표 루틴을 완벽하게 해내셨습니다. 흘린 땀방울만큼 더 건강해진 하루입니다! 출석 캘린더에 오늘의 기록이 저장되었습니다.
+            </motion.p>
+            
+            <motion.button 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
               onClick={onReset}
-              className="w-full max-w-xs py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black rounded-2xl shadow-2xl shadow-purple-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+              className="w-full max-w-xs py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-lg rounded-2xl shadow-2xl shadow-purple-500/30 hover:scale-[1.02] active:scale-95 transition-all relative z-10"
             >
               홈으로 돌아가기
-            </button>
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>

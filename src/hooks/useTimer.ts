@@ -11,7 +11,7 @@ interface UseTimerProps {
   roundRestDuration?: number;
   rounds?: number;
   onStepComplete?: () => void;
-  onBeep?: (type: 'prepare' | 'start' | 'rest' | 'stop') => void;
+  onBeep?: (type: 'prepare' | 'start' | 'rest' | 'stop' | 'finish') => void;
 }
 
 export const useTimer = ({
@@ -72,7 +72,7 @@ export const useTimer = ({
     }
   }, [exercises, status, workDuration]);
 
-  const beep = useCallback((type: 'prepare' | 'start' | 'rest' | 'stop') => {
+  const beep = useCallback((type: 'prepare' | 'start' | 'rest' | 'stop' | 'finish') => {
     onBeep?.(type);
   }, [onBeep]);
 
@@ -199,7 +199,7 @@ export const useTimer = ({
       } else {
         // Absolute last exercise of the entire workout
         setStatus('finished');
-        beep('stop');
+        beep('finish');
       }
     } else if (s === 'resting') {
       const isRoundRest = idx === exs.length - 1;

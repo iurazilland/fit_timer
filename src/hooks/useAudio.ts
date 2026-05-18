@@ -133,7 +133,7 @@ export const useAudio = () => {
     }
   }, []);
 
-  const notify = useCallback((type: 'prepare' | 'start' | 'stop' | 'rest') => {
+  const notify = useCallback((type: 'prepare' | 'start' | 'stop' | 'rest' | 'finish') => {
     switch (type) {
       case 'prepare':
         playBeep(440, 0.1);
@@ -144,6 +144,29 @@ export const useAudio = () => {
       case 'stop':
       case 'rest':
         playBeep(220, 0.3);
+        break;
+      case 'finish':
+        if (!audioCtx.current) return;
+        if (audioCtx.current.state === 'suspended') audioCtx.current.resume();
+        const now = audioCtx.current.currentTime;
+        const notes = [
+          { freq: 523.25, time: 0, dur: 0.15 },    // C5
+          { freq: 659.25, time: 0.15, dur: 0.15 }, // E5
+          { freq: 783.99, time: 0.3, dur: 0.15 },  // G5
+          { freq: 1046.50, time: 0.45, dur: 0.4 }  // C6
+        ];
+        notes.forEach(note => {
+          const osc = audioCtx.current!.createOscillator();
+          const gain = audioCtx.current!.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(note.freq, now + note.time);
+          gain.gain.setValueAtTime(0.3, now + note.time);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + note.time + note.dur);
+          osc.connect(gain);
+          gain.connect(audioCtx.current!.destination);
+          osc.start(now + note.time);
+          osc.stop(now + note.time + note.dur);
+        });
         break;
     }
   }, []);

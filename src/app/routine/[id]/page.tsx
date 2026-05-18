@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Plus, Play, Trash2, Clock, Dumbbell, Music, GripVertical } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
@@ -328,6 +328,45 @@ export default function RoutineDetail() {
   useEffect(() => {
     setBGM(timer.status, isMusicMuted);
   }, [timer.status, isMusicMuted, setBGM]);
+
+  const hasRecordedAttendance = useRef(false);
+
+  useEffect(() => {
+    if (timer.status === 'finished') {
+      if (!hasRecordedAttendance.current) {
+        hasRecordedAttendance.current = true;
+        try {
+          const sumW = routine.exercises.reduce((acc: number, ex: any) => acc + (ex.workTime || 30), 0);
+          const sumR = routine.exercises.length > 1 
+            ? routine.exercises.slice(0, -1).reduce((acc: number, ex: any) => acc + (ex.restTime || 10), 0)
+            : 0;
+          const lastR = routine.exercises.length > 0 ? (routine.exercises[routine.exercises.length - 1].restTime || 10) : 0;
+          const rRest = routine.roundRest ?? 0;
+          const rds = routine.rounds || 1;
+          
+          const effRest = rRest > 0 ? rRest : lastR;
+          const totalSecs = (sumW + sumR + effRest) * (rds - 1) + (sumW + sumR);
+
+          const todayStr = new Date().toISOString().split('T')[0];
+          const stored = localStorage.getItem('homefit_attendance');
+          const attendanceData = stored ? JSON.parse(stored) : {};
+
+          const existing = attendanceData[todayStr] || { totalSeconds: 0, count: 0 };
+          attendanceData[todayStr] = {
+            totalSeconds: existing.totalSeconds + totalSecs,
+            count: existing.count + 1
+          };
+
+          localStorage.setItem('homefit_attendance', JSON.stringify(attendanceData));
+          window.dispatchEvent(new Event('attendance_updated'));
+        } catch (err) {
+          console.error('Failed to record attendance:', err);
+        }
+      }
+    } else if (timer.status === 'idle') {
+      hasRecordedAttendance.current = false;
+    }
+  }, [timer.status, routine]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (id.startsWith('p-')) return;
