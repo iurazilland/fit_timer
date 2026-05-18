@@ -76,6 +76,66 @@ export const useTimer = ({
     onBeep?.(type);
   }, [onBeep]);
 
+  // Wake Lock API: Prevent screen from sleeping during active workout
+  const wakeLockRef = useRef<any>(null);
+
+  const requestWakeLock = useCallback(async () => {
+    if (typeof window !== 'undefined' && 'wakeLock' in navigator) {
+      try {
+        if (!wakeLockRef.current) {
+          wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+          wakeLockRef.current.addEventListener('release', () => {
+            wakeLockRef.current = null;
+          });
+        }
+      } catch (err) {
+        console.warn('Wake Lock error:', err);
+      }
+    }
+  }, []);
+
+  const releaseWakeLock = useCallback(async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      } catch (err) {
+        console.warn('Wake Lock release error:', err);
+      }
+    }
+  }, []);
+
+  // Manage Wake Lock based on timer status
+  useEffect(() => {
+    const isRunning = status === 'preparing' || status === 'working' || status === 'resting';
+    if (isRunning) {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    return () => {
+      releaseWakeLock();
+    };
+  }, [status, requestWakeLock, releaseWakeLock]);
+
+  // Handle visibility change (re-request wake lock if tab becomes visible while timer is running)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const isRunning = status === 'preparing' || status === 'working' || status === 'resting';
+      if (document.visibilityState === 'visible' && isRunning) {
+        requestWakeLock();
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+  }, [status, requestWakeLock]);
+
   // Timer Interval - ONLY decrements timeLeft
   useEffect(() => {
     if (status === 'working' || status === 'resting' || status === 'preparing') {
