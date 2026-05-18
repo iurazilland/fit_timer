@@ -254,18 +254,18 @@ export default function TimerDisplay({
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-300 mb-4 tracking-tight relative z-10"
+              className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight relative z-10"
             >
-              🎉 운동 완료를 축하합니다!
+              AWESOME!
             </motion.h2>
             
             <motion.p 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-slate-400 text-lg md:text-xl mb-12 max-w-md relative z-10 font-medium leading-relaxed"
+              className="text-slate-400 text-lg md:text-xl mb-12 relative z-10 font-medium"
             >
-              오늘의 목표 루틴을 완벽하게 해내셨습니다. 흘린 땀방울만큼 더 건강해진 하루입니다! 출석 캘린더에 오늘의 기록이 저장되었습니다.
+              오늘의 루틴을 모두 완료했습니다.
             </motion.p>
             
             <motion.button 
